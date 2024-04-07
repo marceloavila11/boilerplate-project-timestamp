@@ -24,7 +24,32 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// Función auxiliar para obtener la fecha en formato UTC y Unix
+function formatDate(date) {
+  return { unix: date.getTime(), utc: date.toUTCString() };
+}
 
+// Manejar solicitud con parámetro de fecha
+app.get("/api/:date", function (req, res) {
+  let dateString = req.params.date;
+
+  // Determinar si dateString es un número (milisegundos Unix) o una fecha
+  let date;
+  if (!isNaN(parseInt(dateString))) {
+    // Es un número, asumir milisegundos Unix
+    date = new Date(parseInt(dateString));
+  } else {
+    // Tratar como cadena de fecha
+    date = new Date(dateString);
+  }
+
+  // Verificar si la fecha es válida
+  if (!isNaN(date.getTime())) {
+    res.json(formatDate(date));
+  } else {
+    res.json({ error: "Fecha no válida" });
+  }
+});
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
